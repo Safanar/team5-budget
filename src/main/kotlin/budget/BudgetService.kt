@@ -2,7 +2,6 @@ package budget
 
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.DoubleSummaryStatistics
 
 class BudgetService(
     private val budgetRepo: BudgetRepo
@@ -14,35 +13,19 @@ class BudgetService(
             end = YearMonth.of(endDate.year, endDate.month)
         ).associateBy { YearMonth.of(it.getYearMonthDate().year, it.getYearMonthDate().monthValue) }
 
-        var yearMonth = YearMonth.of(startDate.year, startDate.month)
-        val endYearMonth = YearMonth.of(endDate.year, endDate.month)
-        val dayAmountMap = mutableMapOf<YearMonth, Double>()
-        while(yearMonth <= endYearMonth) {
-            val monthBudget = yearMonthBudgetMap[yearMonth] ?: Budget(yearMonth.toMyString())
-            dayAmountMap[yearMonth] = getDayBudget(monthBudget)
-            yearMonth = yearMonth.plusMonths(1)
-        }
-        val map = mutableMapOf<YearMonth, Int>()
-        var date = startDate
-        while(date <= endDate) {
-            val keyMonth = YearMonth.of(date.year, date.month)
-            if (map.containsKey(keyMonth)) {
-                map[keyMonth] = map[keyMonth]!!.plus(1)
-            } else {
-                map[keyMonth] = 1
-            }
-            date = date.plusDays(1)
-        }
-
+        val amountMap = getDayAmountOfEachMonth(startDate, endDate, yearMonthBudgetMap)
+        val dayMap = getDayOfEachMonth(startDate, endDate)
         var amount = 0.00
-        map.forEach{ (yearMonth, day) ->
-            amount += day* (dayAmountMap[yearMonth] ?: 0.00)
+        dayMap.forEach{ (yearMonth, day) ->
+            amount += day* (amountMap[yearMonth] ?: 0.00)
         }
 
         return amount
     }
 
-    fun getRange(start: YearMonth, end: YearMonth): List<Budget> {
+    fun YearMonth.toMyString():String = this.toString().replace("-", "")
+
+    private fun getRange(start: YearMonth, end: YearMonth): List<Budget> {
         if (end.isBefore(start)) return emptyList()
         val budgetList: List<Budget> = budgetRepo.getAll()
 
@@ -54,9 +37,35 @@ class BudgetService(
         }
     }
 
-    fun getDayBudget(budget: Budget): Double {
+    private fun getDayBudget(budget: Budget): Double {
       return budget.amount.toDouble()/YearMonth.of(budget.getYearMonth().year, budget.getYearMonth().monthValue).lengthOfMonth()
     }
 
-    fun YearMonth.toMyString():String = this.toString().replace("-", "")
+    private fun getDayOfEachMonth(startDate: LocalDate, endDate: LocalDate):Map<YearMonth, Int> {
+        val map = mutableMapOf<YearMonth, Int>()
+        var date = startDate
+        while(date <= endDate) {
+            val keyMonth = YearMonth.of(date.year, date.month)
+            if (map.containsKey(keyMonth)) {
+                map[keyMonth] = map[keyMonth]!!.plus(1)
+            } else {
+                map[keyMonth] = 1
+            }
+            date = date.plusDays(1)
+        }
+        return map
+    }
+
+    private fun getDayAmountOfEachMonth(startDate: LocalDate, endDate: LocalDate, yearMonthBudgetMap: Map<YearMonth, Budget>) : Map<YearMonth, Double> {
+        var yearMonth = YearMonth.of(startDate.year, startDate.month)
+        val endYearMonth = YearMonth.of(endDate.year, endDate.month)
+        val amountMap = mutableMapOf<YearMonth, Double>()
+        while(yearMonth <= endYearMonth) {
+            val monthBudget = yearMonthBudgetMap[yearMonth] ?: Budget(yearMonth.toMyString())
+            amountMap[yearMonth] = getDayBudget(monthBudget)
+            yearMonth = yearMonth.plusMonths(1)
+        }
+        return amountMap
+    }
+
 }
