@@ -50,7 +50,7 @@ class BudgetService(
             val yearMonth = it.getYearMonth()
             val compareToEnd = yearMonth.compareTo(end)
             val compareToStart = yearMonth.compareTo(start)
-            (compareToStart >= 1 || compareToStart == 0) && (compareToEnd <= -1 || compareToEnd == 0)
+            (compareToStart >= 0) && (compareToEnd <= 0)
         }
     }
 
