@@ -9,9 +9,10 @@ class BudgetService(
 
     fun query(startDate: LocalDate, endDate: LocalDate): Double {
         val yearMonthBudgetMap: Map<YearMonth, Budget> = getRange(
-            start = YearMonth.of(startDate.year, startDate.month),
-            end = YearMonth.of(endDate.year, endDate.month)
-        ).associateBy { YearMonth.of(it.getYearMonthDate().year, it.getYearMonthDate().monthValue) }
+            start = YearMonth.from(startDate),
+            end = YearMonth.from(endDate)
+        ).associateBy { YearMonth.from(it.getYearMonthDate()) }
+
 
         val amountMap = getDayAmountOfEachMonth(startDate, endDate, yearMonthBudgetMap)
         val dayMap = getDayOfEachMonth(startDate, endDate)
@@ -38,14 +39,14 @@ class BudgetService(
     }
 
     private fun getDayBudget(budget: Budget): Double {
-      return budget.amount.toDouble()/YearMonth.of(budget.getYearMonth().year, budget.getYearMonth().monthValue).lengthOfMonth()
+      return budget.amount.toDouble()/YearMonth.from(budget.getYearMonth()).lengthOfMonth()
     }
 
     private fun getDayOfEachMonth(startDate: LocalDate, endDate: LocalDate):Map<YearMonth, Int> {
         val map = mutableMapOf<YearMonth, Int>()
         var date = startDate
         while(date <= endDate) {
-            val keyMonth = YearMonth.of(date.year, date.month)
+            val keyMonth = YearMonth.from(date)
             if (map.containsKey(keyMonth)) {
                 map[keyMonth] = map[keyMonth]!!.plus(1)
             } else {
@@ -57,8 +58,8 @@ class BudgetService(
     }
 
     private fun getDayAmountOfEachMonth(startDate: LocalDate, endDate: LocalDate, yearMonthBudgetMap: Map<YearMonth, Budget>) : Map<YearMonth, Double> {
-        var yearMonth = YearMonth.of(startDate.year, startDate.month)
-        val endYearMonth = YearMonth.of(endDate.year, endDate.month)
+        var yearMonth = YearMonth.from(startDate)
+        val endYearMonth = YearMonth.from(endDate)
         val amountMap = mutableMapOf<YearMonth, Double>()
         while(yearMonth <= endYearMonth) {
             val monthBudget = yearMonthBudgetMap[yearMonth] ?: Budget(yearMonth.toMyString())
