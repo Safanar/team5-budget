@@ -1,6 +1,10 @@
 package budget
 
 import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.util.Locale
 
 data class Budget(
     val yearMonth: String = "",
@@ -8,7 +12,16 @@ data class Budget(
 ){
 
     fun getYearMonthDate() : LocalDate {
-        return LocalDate.of(yearMonth.substring(0,4).toInt(), yearMonth.substring(5,6).toInt(), 1)!!
+        return getYearMonth().atDay(1)
     }
+    fun getYearMonth(): YearMonth {
+        val formatter: DateTimeFormatter = DateTimeFormatterBuilder()
+            .parseCaseInsensitive()
+            .appendPattern("uuuuMM")
+            .toFormatter(Locale.ENGLISH)
+
+        return YearMonth.parse(yearMonth, formatter)
+    }
+
 }
 
