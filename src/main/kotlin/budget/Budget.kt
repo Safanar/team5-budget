@@ -16,10 +16,13 @@ data class Budget(
     fun getYearMonth(): YearMonth {
         return YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyyMM"))
     }
-    
-    fun getDayBudget(): Double {
+
+    fun dailyAmount(): Double {
         return amount.toDouble() / getYearMonth().lengthOfMonth()
     }
+
+    fun lastDay(): LocalDate = getYearMonth().atEndOfMonth()
+    fun firstDay(): LocalDate = getYearMonth().atDay(1)
 
 }
 
