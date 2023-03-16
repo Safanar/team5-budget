@@ -9,12 +9,12 @@ class BudgetService(
 
     fun query(startDate: LocalDate, endDate: LocalDate): Double {
         val yearMonthBudgetMap: Map<YearMonth, Budget> = getRange(
-            start = YearMonth.of(startDate.year, startDate.month),
-            end = YearMonth.of(endDate.year, endDate.month)
+            start = YearMonth.from(startDate),
+            end = YearMonth.from(endDate)
         ).associateBy { YearMonth.of(it.getYearMonthDate().year, it.getYearMonthDate().monthValue) }
 
-        var yearMonth = YearMonth.of(startDate.year, startDate.month)
-        val endYearMonth = YearMonth.of(endDate.year, endDate.month)
+        var yearMonth = YearMonth.from(startDate)
+        val endYearMonth = YearMonth.from(endDate)
         val dayAmountMap = mutableMapOf<YearMonth, Double>()
         while (yearMonth <= endYearMonth) {
             val monthBudget = yearMonthBudgetMap[yearMonth] ?: Budget(yearMonth.toMyString())
