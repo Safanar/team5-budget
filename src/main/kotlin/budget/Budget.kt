@@ -24,5 +24,8 @@ data class Budget(
     fun lastDay(): LocalDate = getYearMonth().atEndOfMonth()
     fun firstDay(): LocalDate = getYearMonth().atDay(1)
 
+    fun getAmount(period: Period) = dailyAmount() * period.overlappingDays(getPeriod())
+
+    private fun getPeriod() = Period(firstDay(), lastDay())
 }
 
