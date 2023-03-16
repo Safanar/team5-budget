@@ -13,13 +13,13 @@ class BudgetService(
         val budgets = budgetRepo.getAll().filter {
             (it.getYearMonth() >= startYearMonth) && (it.getYearMonth() <= endYearMonth)
         }
-        val yearMonthBudgetMap: Map<YearMonth, Budget> = budgets.associateBy { it.getYearMonth() }
-
         val dayAmountMap = mutableMapOf<YearMonth, Double>()
-        while (startYearMonth <= endYearMonth) {
-            val monthBudget = yearMonthBudgetMap[startYearMonth] ?: Budget(startYearMonth.toMyString())
-            dayAmountMap[startYearMonth] = monthBudget.getDayBudget()
-            startYearMonth = startYearMonth.plusMonths(1)
+        var currentYearMonth = startYearMonth
+        while (currentYearMonth <= endYearMonth) {
+            budgets.find { it.getYearMonth() == currentYearMonth }?.let { budget ->
+                dayAmountMap[currentYearMonth] = budget.getDayBudget()
+            }
+            currentYearMonth = currentYearMonth.plusMonths(1)
         }
         val map = mutableMapOf<YearMonth, Int>()
         var date = startDate
@@ -40,7 +40,4 @@ class BudgetService(
 
         return amount
     }
-
-
-    private fun YearMonth.toMyString(): String = this.toString().replace("-", "")
 }
