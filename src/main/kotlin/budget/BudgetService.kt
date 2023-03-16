@@ -8,11 +8,10 @@ class BudgetService(
 ) {
 
     fun query(startDate: LocalDate, endDate: LocalDate): Double {
-        var startYearMonth = YearMonth.from(startDate)
+        if (startDate.isAfter(endDate)) return 0.0
+        val startYearMonth = YearMonth.from(startDate)
         val endYearMonth = YearMonth.from(endDate)
-        val budgets = budgetRepo.getAll().filter {
-            (it.getYearMonth() >= startYearMonth) && (it.getYearMonth() <= endYearMonth)
-        }
+        val budgets = budgetRepo.getAll()
         val dayAmountMap = mutableMapOf<YearMonth, Double>()
         var currentYearMonth = startYearMonth
         while (currentYearMonth <= endYearMonth) {
