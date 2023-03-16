@@ -9,10 +9,6 @@ data class Budget(
     val amount: Int = 0
 ) {
 
-    fun getYearMonthDate(): LocalDate {
-        return getYearMonth().atDay(1)
-    }
-
     fun getYearMonth(): YearMonth {
         return YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyyMM"))
     }
