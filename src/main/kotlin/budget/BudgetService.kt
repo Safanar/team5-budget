@@ -18,7 +18,7 @@ class BudgetService(
         val dayAmountMap = mutableMapOf<YearMonth, Double>()
         while (startYearMonth <= endYearMonth) {
             val monthBudget = yearMonthBudgetMap[startYearMonth] ?: Budget(startYearMonth.toMyString())
-            dayAmountMap[startYearMonth] = getDayBudget(monthBudget)
+            dayAmountMap[startYearMonth] = monthBudget.getDayBudget()
             startYearMonth = startYearMonth.plusMonths(1)
         }
         val map = mutableMapOf<YearMonth, Int>()
@@ -41,10 +41,6 @@ class BudgetService(
         return amount
     }
 
-    private fun getDayBudget(budget: Budget): Double {
-        return budget.amount.toDouble() / YearMonth.of(budget.getYearMonth().year, budget.getYearMonth().monthValue)
-            .lengthOfMonth()
-    }
 
     private fun YearMonth.toMyString(): String = this.toString().replace("-", "")
 }

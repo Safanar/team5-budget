@@ -3,24 +3,22 @@ package budget
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.util.Locale
 
 data class Budget(
     val yearMonth: String = "",
     val amount: Int = 0
-){
+) {
 
-    fun getYearMonthDate() : LocalDate {
+    fun getYearMonthDate(): LocalDate {
         return getYearMonth().atDay(1)
     }
-    fun getYearMonth(): YearMonth {
-        val formatter: DateTimeFormatter = DateTimeFormatterBuilder()
-            .parseCaseInsensitive()
-            .appendPattern("uuuuMM")
-            .toFormatter(Locale.ENGLISH)
 
-        return YearMonth.parse(yearMonth, formatter)
+    fun getYearMonth(): YearMonth {
+        return YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyyMM"))
+    }
+    
+    fun getDayBudget(): Double {
+        return amount.toDouble() / getYearMonth().lengthOfMonth()
     }
 
 }
